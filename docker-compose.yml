@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+ postgres:
+    image: postgres:latest
+    container_name: my_go_postgres
+    environment:
+      POSTGRES_DB: nettasec
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./sql_script/create_table.sql:/docker-entrypoint-initdb.d/create_table.sql
+      - ./sql_script/fill_table.sql:/docker-entrypoint-initdb.d/fill_table.sql 
+    ports:
+      - "5432:5432"
+    restart: always
+
+volumes:
+ pgdata:
