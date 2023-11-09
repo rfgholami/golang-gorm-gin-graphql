@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
- postgres:
+  postgres:
     image: postgres:latest
     container_name: my_go_postgres
     environment:
@@ -11,10 +11,20 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./sql_script/create_table.sql:/docker-entrypoint-initdb.d/create_table.sql
-      - ./sql_script/fill_table.sql:/docker-entrypoint-initdb.d/fill_table.sql 
     ports:
       - "5432:5432"
     restart: always
 
+  # golang_api:
+  #   build: .
+  #   container_name: golang_api
+  #   ports:
+  #     - "9898:9898"
+  #   restart: on-failure
+  #   depends_on:
+  #     - postgres
+  #   links:
+  #     - postgres
+
 volumes:
- pgdata:
+  pgdata:

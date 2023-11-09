@@ -1,1 +1,1 @@
-INSERT INTO nettasec_go_api_table(username,password) VALUES('kwa','root'),('admin','admin'),('john','john'),('manager','manager')
+INSERT INTO users(username,password) VALUES('kwa','root'),('admin','admin'),('john','john'),('manager','manager')
