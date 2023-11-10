@@ -5,7 +5,6 @@ import (
 	"github.com/kwa0x2/GoLang-Postgre-API/config"
 	"github.com/kwa0x2/GoLang-Postgre-API/routes"
 )
-
 func main() {
 	router := gin.New()
 	config.Connect()

@@ -2,66 +2,123 @@ package controller
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/kwa0x2/GoLang-Postgre-API/config"
+	"github.com/kwa0x2/GoLang-Postgre-API/helper"
 	"github.com/kwa0x2/GoLang-Postgre-API/models"
-	"gorm.io/gorm"
+	"github.com/kwa0x2/GoLang-Postgre-API/response"
 )
 
-func checkError(ctx *gin.Context, result *gorm.DB) bool {
-	if result.Error != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": result.Error.Error()})
-		return true
-	}
-	return false
-}
+var users models.User
 
-func GetUser(ctx *gin.Context) {
+func GetUsers(ctx *gin.Context) {
 	var users []models.User
 	result := config.DB.Raw("SELECT * FROM users ORDER BY id asc").Scan(&users)
 
-	if checkError(ctx, result){
+	if helper.CheckError(ctx, result) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, &users)
+	ctx.JSON(http.StatusOK, response.Response{
+		Code:     http.StatusOK,
+		Status:   "OK",
+		RowCount: int(result.RowsAffected),
+		Data:     &users,
+	})
 }
 
-func GetUserByID(ctx *gin.Context){
+func GetUserByID(ctx *gin.Context) {
 	id := ctx.Param("id")
-
-	var users models.User
 	result := config.DB.Raw("SELECT * FROM users WHERE id=?", id).Scan(&users)
 
-	if checkError(ctx, result){
+	if helper.CheckError(ctx, result) {
 		return
 	}
 
 	ctx.JSON(http.StatusFound, &users)
 }
 
-func DeleteUserByID(ctx *gin.Context){
+func DeleteUserByID(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	var users models.User
-	result := config.DB.Raw("DELETE FROM users WHERE id=?", id).Scan(&users)
-	if checkError(ctx, result){
+	result := config.DB.Exec("DELETE FROM users WHERE id=?", id)
+	if helper.CheckError(ctx, result) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, true)
+	ctx.JSON(http.StatusOK, response.Response{
+		Code:    http.StatusOK,
+		Status:  "OK",
+		Message: "User deleted successfully",
+	})
+}
+
+func PutUserByID(ctx *gin.Context) {
+	ctx.BindJSON(&users)
+
+	id := ctx.Param("id")
+
+	result := config.DB.Exec("UPDATE users SET username=?, password=? WHERE id=?", users.Username, users.Password, id)
+
+	if helper.CheckError(ctx, result) {
+		return
+	}
+
+	ctx.JSON(http.StatusOK, response.Response{
+		Code:    http.StatusOK,
+		Status:  "OK",
+		Message: "User updated successfully",
+	})
 }
 
 func PostUser(ctx *gin.Context) {
-	var users models.User
 	ctx.BindJSON(&users)
 
-	result := config.DB.Raw("INSERT INTO users(username,password) VALUES(?,?) RETURNING id", users.Username, users.Password).Scan(&users)
+	result := config.DB.Exec("INSERT INTO users(username,password) VALUES(?,?)", users.Username, users.Password)
 
-	if checkError(ctx, result){
+	if helper.CheckError(ctx, result) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, &users)
+	ctx.JSON(http.StatusCreated, response.Response{
+		Code:    http.StatusCreated,
+		Status:  "CREATED",
+		Message: "User created successfully",
+	})
+}
+
+func PatchUser(ctx *gin.Context) {
+	ctx.BindJSON(&users)
+	id := ctx.Param("id")
+
+	var sets []string
+	if users.Username != "" {
+		sets = append(sets, "username='"+users.Username+"'")
+	}
+	if users.Password != "" {
+		sets = append(sets, "password='"+users.Password+"'")
+	}
+
+	if len(sets) == 0 {
+		ctx.JSON(http.StatusBadRequest, response.Response{
+			Code:    http.StatusBadRequest,
+			Status:  "BAD REQUEST",
+			Error: "No valid fields to update",
+		})
+		return
+	}
+
+	result := config.DB.Exec("UPDATE users SET " + strings.Join(sets, ", ") + " WHERE id=" + id + "")
+
+	if helper.CheckError(ctx, result) {
+		return
+	}
+
+	ctx.JSON(http.StatusOK, response.Response{
+		Code:    http.StatusOK,
+		Status:  "OK",
+		Message: "User updated successfully",
+	})
 }
