@@ -15,16 +15,16 @@ services:
       - "5432:5432"
     restart: always
 
-  # golang_api:
-  #   build: .
-  #   container_name: golang_api
-  #   ports:
-  #     - "9898:9898"
-  #   restart: on-failure
-  #   depends_on:
-  #     - postgres
-  #   links:
-  #     - postgres
+  golang_api:
+    build: .
+    container_name: golang_api
+    ports:
+      - "9898:9898"
+    restart: on-failure
+    depends_on:
+      - postgres
+    links:
+      - postgres
 
 volumes:
   pgdata:
