@@ -12,7 +12,7 @@ import (
 var DB *gorm.DB
 
 func Connect(){
-	db, err := gorm.Open(postgres.Open("postgres://<username>:<password>@<localhost>/<database>?sslmode=disable"), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open("postgres://<username>:<password>@<docker-service-name>/<database>?sslmode=disable"), &gorm.Config{})
 
 	if err != nil{
 		panic(err)
