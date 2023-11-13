@@ -7,8 +7,6 @@ import (
 	"log"
 )
 
-var requestBody string
-
 var user = graphql.NewObject(graphql.ObjectConfig{
 	Name: "User",
 	Fields: graphql.Fields{
@@ -23,7 +21,6 @@ var user = graphql.NewObject(graphql.ObjectConfig{
 		},
 	},
 })
-var users []models.User
 
 func RoutePost() graphql.Schema {
 

@@ -19,6 +19,5 @@ func main() {
 
 	http.Handle("/graphql", h)
 	http.ListenAndServe(":9898", nil)
-	//router.Run(":9898")
 
 }

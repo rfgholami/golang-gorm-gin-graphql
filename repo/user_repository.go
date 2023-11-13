@@ -7,21 +7,12 @@ import (
 
 func GetUserByID(id int) models.User {
 
-	//result := config.DB.Find(&user, id).Scan(&user).First(&user)
-	//return result
 	var user models.User
 
 	config.DB.Model(&user).Where("id = ?", id).Scan(&user)
 	return user
 }
 
-func GetUsers(limit int) []models.User {
-
-	var users []models.User
-
-	config.DB.Model(models.User{}).Limit(limit).Find(&users)
-	return users
-}
 func GetUsersPageable(page int, size int) []models.User {
 
 	var users []models.User
