@@ -1,4 +1,4 @@
-package response
+package models
 
 type Request struct {
 	Entity string      `json:"entity"`

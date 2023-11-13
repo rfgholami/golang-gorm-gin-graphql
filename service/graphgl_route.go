@@ -27,23 +27,6 @@ var users []models.User
 
 func RoutePost() graphql.Schema {
 
-	/*	err := ctx.BindJSON(&requestBody)
-		if err != nil {
-			log.Fatalf("error: %v", err)
-		}*/
-	/*	err := ctx.BindJSON(&request)
-		if err != nil {
-			log.Fatalf("error: %v", err)
-		}*/
-
-	//bodyAsByteArray, _ := ioutil.ReadAll(ctx.Request.Body)
-	//jsonBody := string(bodyAsByteArray)
-
-	/*	jsonBody := `{
-	    "entity": "fffff",
-	    "data": {}
-	}`*/
-
 	var rootQuery = graphql.NewObject(graphql.ObjectConfig{
 		Name: "RootQuery",
 		Fields: graphql.Fields{
