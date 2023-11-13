@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"github.com/graphql-go/graphql"
+	"log"
 	"net/http"
 	"strings"
 
@@ -15,7 +17,8 @@ var users models.User
 
 func GetUsers(ctx *gin.Context) {
 	var users []models.User
-	result := config.DB.Raw("SELECT * FROM users ORDER BY id asc").Scan(&users)
+
+	result := config.DB.Find(&users)
 
 	if helper.CheckError(ctx, result) {
 		return
@@ -28,10 +31,56 @@ func GetUsers(ctx *gin.Context) {
 		Data:     &users,
 	})
 }
+func UsersGQL(ctx *gin.Context) {
+	var users []models.User
+
+	result := config.DB.Find(&users)
+
+	if helper.CheckError(ctx, result) {
+		return
+	}
+
+	fields := graphql.Fields{
+		"hello": &graphql.Field{
+			Type: graphql.String,
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				return "world", nil
+			},
+		},
+	}
+
+	rootQuery := graphql.ObjectConfig{Name: "RootQuery", Fields: fields}
+	schemaConfig := graphql.SchemaConfig{Query: graphql.NewObject(rootQuery)}
+	schema, err := graphql.NewSchema(schemaConfig)
+	if err != nil {
+		log.Fatalf("failed to create new schema, error: %v", err)
+	}
+
+	// Query
+	query := `
+		{
+			hello
+		}
+	`
+	params := graphql.Params{Schema: schema, RequestString: query}
+	r := graphql.Do(params)
+	if len(r.Errors) > 0 {
+		log.Fatalf("failed to execute graphql operation, errors: %+v", r.Errors)
+	}
+
+	ctx.JSON(http.StatusOK, response.Response{
+		Code:   http.StatusOK,
+		Status: "OK",
+		Data:   &r,
+	})
+
+}
 
 func GetUserByID(ctx *gin.Context) {
 	id := ctx.Param("id")
-	result := config.DB.Raw("SELECT * FROM users WHERE id=?", id).Scan(&users)
+
+	var user models.User
+	result := config.DB.Find(&user, id)
 
 	if helper.CheckError(ctx, result) {
 		return
@@ -103,9 +152,9 @@ func PatchUser(ctx *gin.Context) {
 
 	if len(sets) == 0 {
 		ctx.JSON(http.StatusBadRequest, response.Response{
-			Code:    http.StatusBadRequest,
-			Status:  "BAD REQUEST",
-			Error: "No valid fields to update",
+			Code:   http.StatusBadRequest,
+			Status: "BAD REQUEST",
+			Error:  "No valid fields to update",
 		})
 		return
 	}

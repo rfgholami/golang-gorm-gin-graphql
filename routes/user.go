@@ -15,11 +15,12 @@ func UserRoute(router *gin.Engine) {
 
 	users := router.Group("/api")
 	users.GET("/users", controller.GetUsers)
+	users.GET("/gql", controller.UsersGQL)
+	users.POST("/", controller.RoutePost)
 	users.POST("/users", controller.PostUser)
 	users.GET("/users/:id", controller.GetUserByID)
 	users.DELETE("/users/:id", controller.DeleteUserByID)
 	users.PUT("/users/:id", controller.PutUserByID)
 	users.PATCH("/users/:id", controller.PatchUser)
-
 
 }
