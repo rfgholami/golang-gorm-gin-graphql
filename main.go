@@ -1,8 +1,10 @@
 package main
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/graphql-go/handler"
 	"github.com/kwa0x2/GoLang-Postgre-API/config"
+	"github.com/kwa0x2/GoLang-Postgre-API/routes"
 	"github.com/kwa0x2/GoLang-Postgre-API/service"
 	"net/http"
 )
@@ -16,8 +18,19 @@ func main() {
 		Pretty:   true,
 		GraphiQL: false,
 	})
+	service.Register()
+	service.Find("go")
 
+	router := gin.New()
+
+	routes.HealthCheck(router)
+	routes.UserManagement(router)
+
+	http.Handle("/", router)
 	http.Handle("/graphql", h)
-	http.ListenAndServe(":9898", nil)
+	err := http.ListenAndServe(":9898", nil)
+	if err != nil {
+		return
+	}
 
 }
