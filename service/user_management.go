@@ -48,6 +48,42 @@ func LoginRest(ctx *gin.Context) {
 
 }
 
+func Logout(ctx *gin.Context) {
+
+	address, port := Find("USER-MANAGEMENT")
+	url := fmt.Sprintf("http://%s:%d/user/logout", address, port)
+	req, err := http.NewRequest("POST", url, nil)
+	if err != nil {
+		log.Fatal("Error creating request:", err)
+	}
+	for _, cookie := range ctx.Request.Cookies() {
+		req.Header.Set("Cookie", fmt.Sprintf("%s=%s", cookie.Name, cookie.Value))
+	}
+	// Set headers
+	req.Header.Set("Content-Type", "application/json")
+
+	ctx.JSON(http.StatusCreated, req)
+
+	// Send the request
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		log.Fatal("Error sending request:", err)
+	}
+	defer resp.Body.Close()
+	resp.Cookies()
+	// Read response body
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal("Error reading response:", err)
+	}
+	for _, cookie := range resp.Cookies() {
+		ctx.SetCookie(cookie.Name, cookie.Value, cookie.MaxAge, cookie.Path, cookie.Domain, cookie.Secure, cookie.HttpOnly)
+	}
+	//ctx.JSON(http.StatusOK, string(body))
+	ctx.Data(http.StatusOK, "application/json", body)
+
+}
+
 func GetUserInfo(ctx *gin.Context) {
 
 	address, port := Find("USER-MANAGEMENT")
