@@ -2,9 +2,11 @@ package service
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/kwa0x2/GoLang-Postgre-API/helper"
+	"github.com/kwa0x2/GoLang-Postgre-API/models"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -93,11 +95,17 @@ func GetUserInfo(ctx *gin.Context) {
 
 }
 
-func CheckAccess(ctx *gin.Context) {
+func CheckAccess(ctx *gin.Context) bool {
 
 	address, port := Find("USER-MANAGEMENT")
 	url := fmt.Sprintf("http://%s:%d/check-access", address, port)
-	req, err := http.NewRequest("POST", url, ctx.Request.Body)
+
+	var checkAccessReq models.CheckAccessRequest
+	checkAccessReq.Url = ctx.Request.URL.Path
+
+	reqBody := fmt.Sprintf("{\"url\":\"%s\"}", checkAccessReq.Url)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(reqBody)))
+
 	if err != nil {
 		log.Fatal("Error creating request:", err)
 	}
@@ -116,16 +124,20 @@ func CheckAccess(ctx *gin.Context) {
 		log.Fatal("Error sending request:", err)
 	}
 	defer resp.Body.Close()
-	resp.Cookies()
-	// Read response body
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal("Error reading response:", err)
-	}
-	for _, cookie := range resp.Cookies() {
-		ctx.SetCookie(cookie.Name, cookie.Value, cookie.MaxAge, cookie.Path, cookie.Domain, cookie.Secure, cookie.HttpOnly)
-	}
-	//ctx.JSON(http.StatusOK, string(body))
-	ctx.Data(http.StatusOK, "application/json", body)
 
+	var checkAccess models.CheckAccess
+	getJson(resp, &checkAccess)
+
+	if checkAccess.ResponseCode == 0 {
+		return true
+	}
+
+	return false
+}
+func getJson(res *http.Response, target interface{}) error {
+
+	if err != nil {
+		return err
+	}
+	return json.NewDecoder(res.Body).Decode(&target)
 }

@@ -10,6 +10,5 @@ func UserManagement(router *gin.Engine) {
 	users := router.Group("/")
 	users.POST("/login", service.LoginRest)
 	users.POST("/get-user-info", service.GetUserInfo)
-	users.POST("/check-access", service.CheckAccess)
 
 }

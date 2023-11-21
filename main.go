@@ -25,8 +25,11 @@ func main() {
 
 	routes.HealthCheck(router)
 	routes.UserManagement(router)
+	routes.HomePageRoute(router)
+	routes.Person(router)
 
 	http.Handle("/", router)
+
 	http.Handle("/graphql", h)
 	err := http.ListenAndServe(":9898", nil)
 	if err != nil {
