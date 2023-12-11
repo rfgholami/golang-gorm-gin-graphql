@@ -9,6 +9,7 @@ func Person(router *gin.Engine) {
 
 	users := router.Group("/persons")
 	users.GET("/", service.List)
-	users.GET("/edit/", service.List2)
+
+	users.POST("/save/", service.CreatePerson)
 
 }

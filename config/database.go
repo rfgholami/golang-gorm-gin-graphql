@@ -46,6 +46,8 @@ func Connect() {
 	fmt.Println("Connected to database: ", sqlDB.Ping() == nil)
 
 	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.Person{})
+	db.AutoMigrate(&models.Address{})
 
 	DB = db
 

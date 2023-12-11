@@ -21,7 +21,6 @@ func Register() {
 	registration.Name = "go"
 	registration.Address = "localhost"
 	registration.Port = 9898
-	registration.Port = 9898
 	registration.Check = &api.AgentServiceCheck{
 		HTTP:     fmt.Sprintf("http://172.30.80.28:%d/health-check", 9898),
 		Interval: "10s", // Check every 10 seconds
