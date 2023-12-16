@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type Address struct {
 	gorm.Model
-	ID         uint   `json:"id" gorm:"primaryKey"`
+	ID         uint   `json:"ID" gorm:"primaryKey"`
 	Name       string `json:"name"`
 	Title      string `json:"title"`
 	PostalCode string `json:"postalCode"`

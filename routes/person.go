@@ -11,5 +11,7 @@ func Person(router *gin.Engine) {
 	users.GET("/", service.List)
 
 	users.POST("/save/", service.CreatePerson)
+	users.DELETE("/delete/:id", service.DeletePerson)
+	users.GET("/:id", service.FindPersonById)
 
 }
