@@ -1,4 +1,4 @@
-# GoLang-Postgre-API
-Example a Dockerized REST API using Golang, Gin, Gorm, and PostgreSQL
+# golang-gorm-gin-graphql
+Example a REST and Graphql API using Golang, Gin, Gorm, and PostgreSQL
 
-`docker-compose up --build -d`
+
